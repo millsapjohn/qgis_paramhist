@@ -3,6 +3,8 @@ from qgis.core import QgsUserProfile, QgsApplication
 import os
 import xml.etree.ElementTree as et
 
+# TODO: figure out the best way to avoid returning an empty history
+
 app = QgsApplication.instance()
 
 def getProfileDbs(app: QgsApplication):
