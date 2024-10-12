@@ -1,17 +1,21 @@
 from qgis.PyQt.QtWidgets import QDockWidget, QAction
 from qgis.PyQt.QtGui import QIcon
 from qgis.utils import iface
+from qgis.core import QgsApplication
+
+from .hist_connect import getProfileDbs, fetchHistory, parseHistory
 
 class ParamPanel(QDockWidget):
     def __init__(self):
         super().__init__()
         self.setObjectName('ParamHistory')
         self.setWindowTitle("Param History")
+        self.instance = QgsApplication.instance()
 
-    def loadHistory(self):
+    def loadHistories(self):
         # TODO: get dbs, fetch histories, parse histories
-        pass
-
+        self.db_list = getProfileDbs(self.instance)
+        
     # TODO: combine, sort histories
     # TODO: populate table widget with combined history
     # TODO: add algorithm icon to table
