@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.utils import iface
 import os
 from .paramdock import ParamPanel
-from .hist_connect import getProfileDb, fetchHistory, parseHistory, writeHistory
+from .hist_connect import getProfileDb, getNewDb, fetchHistory, parseHistory, writeHistory
 
 class ParamHistPlugin:
     def __init__(self, iface):
@@ -27,8 +27,7 @@ class ParamHistPlugin:
         del self.dock
 
     def checkDbExists(self):
-        self.pluginpath = os.path.dirname(os.path.realpath(__file__))
-        self.newdbpath = os.path.join(self.pluginpath, 'param-history.db')
+        self.newdbpath = getNewDb(self.instance)
         if os.path.exists(self.newdbpath):
             return True
         else:

@@ -10,6 +10,12 @@ def getProfileDb(app: QgsApplication):
 
     return history_db
 
+def getNewDb(app: QgsApplication):
+    plugin_root = os.path.dirname(os.path.realpath(__file__))
+    newdbpath = os.path.join(plugin_root, 'param-history.db')
+
+    return newdbpath
+
 def fetchHistory(db):
     con = sqlite3.connect(db)
     cur = con.cursor()
@@ -60,11 +66,11 @@ def writeHistory(db, parsed_list):
     cur.close()
     con.close()
 
-'''order of operations:
-- getProfileDb
-- fetchHistory
-- parseHistory
-'''
-
-# TODO: add icon
-# TODO: save parsed history to new sqlite db
+def readNewHistory(db):
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    cur.execute("SELECT id, algorithm, params, timestamp FROM history")
+    res = cur.fetchall()
+    cur.close()
+    con.close()
+    return res
