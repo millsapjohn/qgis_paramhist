@@ -1,9 +1,12 @@
 from qgis.PyQt.QtWidgets import (
+                                QWidget,
+                                QAbstractItemView,
                                 QDockWidget, 
                                 QAction,
                                 QTableWidget, 
                                 QTableWidgetItem,
-                                QVBoxLayout,
+                                QHBoxLayout,
+                                QLabel,
                                 )
 from qgis.PyQt.QtGui import QIcon
 from qgis.utils import iface
@@ -16,12 +19,21 @@ class ParamPanel(QDockWidget):
         self.setObjectName('ParamHistory')
         self.setWindowTitle("Param History")
         self.instance = QgsApplication.instance()
+        self.widget = QWidget()
+        self.layout = QHBoxLayout()
         self.histtable = QTableWidget()
-        self.histtable.setColumnCount(4)
-        self.histtable.setHorizontalHeaderLabels(["", "Algorithm", "Parameters", "Timestamp"])
+        self.histtable.setColumnCount(3)
+        self.histtable.setHorizontalHeaderLabels(["", "Algorithm", "Timestamp"])
         self.loadHistory()
-        self.histtable.setParent(self)
-        self.histtable.show()
+        # TODO: move resizing to the end of widget creation so it sticks
+        self.histtable.resizeColumnToContents(1)
+        self.histtable.resizeColumnToContents(2)
+        self.histtable.itemClicked.connect(self.populateDetailView)
+        self.layout.addWidget(self.histtable)
+        self.detaillabel = QLabel("Detail View")
+        self.layout.addWidget(self.detaillabel)
+        self.widget.setLayout(self.layout)
+        self.setWidget(self.widget)
 
     def loadHistory(self):
         self.dbpath = getNewDb(self.instance)
@@ -38,12 +50,15 @@ class ParamPanel(QDockWidget):
             self.histtable.setItem(pos, 0, icontableitem)
             algtableitem = QTableWidgetItem(item[1])
             self.histtable.setItem(pos, 1, algtableitem)
-            paramtableitem = QTableWidgetItem(item[2])
-            self.histtable.setItem(pos, 2, paramtableitem)
             timestamptableitem = QTableWidgetItem(item[3])
-            self.histtable.setItem(pos, 3, timestamptableitem)
+            self.histtable.setItem(pos, 2, timestamptableitem)
             pos += 1
-        self.histtable.sortItems(3, 1)
+        self.histtable.sortItems(2, 1)
+        self.histtable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+    def populateDetailView(self):
+        self.currenttext = self.histtable.currentItem().text()
+        iface.messageBar().pushMessage(self.currentText)
         
     # TODO: add ability to re-launch algorithm with previous parameters from table
     # TODO: add ability to copy selected history item to clipboard (so you can put it in qNote)
