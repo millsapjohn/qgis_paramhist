@@ -23,7 +23,7 @@ class ParamPanel(QDockWidget):
         self.widget = QWidget()
         self.layout = QHBoxLayout()
         self.histtable = QTableWidget()
-        self.histtable.setColumnCount(3)
+        self.histtable.setColumnCount(4)
         self.histtable.setHorizontalHeaderLabels(["", "Algorithm", "Timestamp"])
         self.loadHistory()
         # TODO: move resizing to the end of widget creation so it sticks
@@ -53,14 +53,24 @@ class ParamPanel(QDockWidget):
             self.histtable.setItem(pos, 1, algtableitem)
             timestamptableitem = QTableWidgetItem(item[3])
             self.histtable.setItem(pos, 2, timestamptableitem)
+            paramtableitem = QTableWidgetItem(item[2])
+            self.histtable.setItem(pos, 3, paramtableitem)
             pos += 1
         self.histtable.sortItems(2, 1)
         self.histtable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.histtable.setColumnHidden(3, True)
 
     def populateDetailView(self):
-        self.currenttext = self.histtable.currentItem().text()
-        iface.messageBar().pushMessage(self.currenttext)
+        row = self.histtable.currentItem().row()
+        algo = self.histtable.item(row, 1).text()
+        time = self.histtable.item(row, 2).text()
+        params = self.parseParams(self.histtable.item(row, 3).text())
+        self.detailstring = "Detail View\n" + "Algorithm: " + algo + "\n" + "time: " + time + "\n" + "Parameters: " + params
+        self.detaillabel.setText(self.detailstring)
+
+    def parseParams(self, params):
+        parsed_params = params.replace(";", "\n")
+        return parsed_params
         
     # TODO: add ability to re-launch algorithm with previous parameters from table
     # TODO: add ability to copy selected history item to clipboard (so you can put it in qNote)
-    # TODO: expand params on click (text box to right)
