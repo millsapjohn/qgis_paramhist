@@ -41,7 +41,7 @@ def parseHistory(hist):
         try:
             item_dict['algorithm'] = alg.displayName()
         except AttributeError:
-            item_dict['algorithm'] = 'unknown'
+            item_dict['algorithm'] = id
         params_string = ""
         for child in root[2][3]:
             try:
