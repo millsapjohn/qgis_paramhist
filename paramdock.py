@@ -1,5 +1,6 @@
 from qgis.PyQt.QtWidgets import (
                                 QWidget,
+                                QTextEdit,
                                 QAbstractItemView,
                                 QDockWidget, 
                                 QTableWidget, 
@@ -33,8 +34,10 @@ class ParamPanel(QDockWidget):
         self.histtable.itemClicked.connect(self.populateDetailView)
         self.histtable.itemDoubleClicked.connect(self.launchAlgorithm)
         self.layout.addWidget(self.histtable)
-        self.detaillabel = QLabel("Detail View")
+        self.detaillabel = QTextEdit("Detail View")
         self.detaillabel.setMinimumWidth(300)
+        self.detaillabel.setMaximumWidth(500)
+        self.detaillabel.setReadOnly(True)
         self.layout.addWidget(self.detaillabel)
         self.searchbox = QLineEdit()
         self.searchbox.setPlaceholderText("Search")
@@ -77,7 +80,7 @@ class ParamPanel(QDockWidget):
         algo = self.histtable.item(row, 1).text()
         time = self.histtable.item(row, 2).text()
         params = self.parseParams(self.histtable.item(row, 3).text())
-        self.detailstring = "Detail View\n" + "Algorithm: " + algo + "\n" + "time: " + time + "\n" + "Parameters: \n" + params
+        self.detailstring = "Algorithm: " + algo + "\n" + "time: " + time + "\n" + "Parameters: \n" + params
         self.detaillabel.setText(self.detailstring)
 
     def launchAlgorithm(self):
