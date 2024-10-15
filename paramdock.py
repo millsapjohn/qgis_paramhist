@@ -9,6 +9,7 @@ from qgis.PyQt.QtWidgets import (
                                 QLabel,
                                 )
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtCore import QObject
 from qgis.utils import iface
 from qgis.core import QgsApplication
 from .hist_connect import getNewDb, readNewHistory
@@ -58,7 +59,7 @@ class ParamPanel(QDockWidget):
 
     def populateDetailView(self):
         self.currenttext = self.histtable.currentItem().text()
-        iface.messageBar().pushMessage(self.currentText)
+        iface.messageBar().pushMessage(self.currenttext)
         
     # TODO: add ability to re-launch algorithm with previous parameters from table
     # TODO: add ability to copy selected history item to clipboard (so you can put it in qNote)
