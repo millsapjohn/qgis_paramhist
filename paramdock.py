@@ -6,8 +6,10 @@ from qgis.PyQt.QtWidgets import (
                                 QTableWidget, 
                                 QTableWidgetItem,
                                 QHBoxLayout,
+                                QVBoxLayout,
                                 QLineEdit,
                                 QLabel,
+                                QPushButton,
                                 )
 from qgis.PyQt.QtGui import QIcon
 import qgis.processing
@@ -21,8 +23,10 @@ class ParamPanel(QDockWidget):
         self.setObjectName('ParamHistory')
         self.setWindowTitle("Param History")
         self.instance = QgsApplication.instance()
+        # overall layout
         self.widget = QWidget()
         self.layout = QHBoxLayout()
+        # history table setup
         self.histtable = QTableWidget()
         self.histtable.setColumnCount(5)
         self.histtable.setHorizontalHeaderLabels(["", "Algorithm", "Timestamp"])
@@ -34,16 +38,31 @@ class ParamPanel(QDockWidget):
         self.histtable.itemClicked.connect(self.populateDetailView)
         self.histtable.itemDoubleClicked.connect(self.launchAlgorithm)
         self.layout.addWidget(self.histtable)
+        # detail box setup
+        self.detaillayout = QVBoxLayout()
         self.detaillabel = QTextEdit("Detail View")
         self.detaillabel.setMinimumWidth(300)
         self.detaillabel.setMaximumWidth(500)
         self.detaillabel.setReadOnly(True)
-        self.layout.addWidget(self.detaillabel)
+        self.detaillayout.addWidget(self.detaillabel)
+        self.clipbutton = QPushButton("Copy to Clipboard")
+        self.clipbutton.clicked.connect(self.clipAction)
+        self.detaillayout.addWidget(self.clipbutton)
+        self.layout.addLayout(self.detaillayout)
+        # search boxes setup
+        self.searchlayout = QVBoxLayout()
         self.searchbox = QLineEdit()
-        self.searchbox.setPlaceholderText("Search")
+        self.searchbox.setPlaceholderText("Search by Keyword")
         self.searchbox.setMaximumWidth(150)
         self.searchbox.textChanged.connect(self.findItem)
-        self.layout.addWidget(self.searchbox)
+        self.searchlayout.addWidget(self.searchbox)
+        self.datebox = QLineEdit()
+        self.datebox.setPlaceholderText("Search by Date")
+        self.datebox.setMaximumWidth(150)
+        self.datebox.textChanged.connect(self.findDate)
+        self.searchlayout.addWidget(self.datebox)
+        self.layout.addLayout(self.searchlayout)
+        # final UI setup
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
 
@@ -100,6 +119,18 @@ class ParamPanel(QDockWidget):
             for row in range(self.histtable.rowCount()):
                 item = self.histtable.item(row, 1)
                 self.histtable.setRowHidden(row, search_term not in item.text().lower())
+
+    def findDate(self):
+        search_term = self.datebox.text().lower()
+        num_rows = self.histtable.rowCount()
+        if num_rows != 0 and len(search_term) != 0:
+            for row in range(self.histtable.rowCount()):
+                item = self.histtable.item(row, 2)
+                self.histtable.setRowHidden(row, search_term not in item.text().lower())
+
+    def clipAction(self):
+        self.instance.clipboard().setText(self.detaillabel.toPlainText())
         
     # TODO: add ability to copy selected history item to clipboard (so you can put it in qNote)
     # TODO: connect to algorithm run signal to update history
+    # TODO: format text in detail view
