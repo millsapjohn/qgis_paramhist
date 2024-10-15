@@ -116,7 +116,6 @@ class ParamPanel(QDockWidget):
         final_param_dict = {key: val for key, val in raw_param_dict.items() if key != 'unknown' and raw_param_dict.get(key) != 'N/A'}
         final_param_dict.update((key, value.split()) for key, value in final_param_dict.items() if key == 'TABLE')
         qgis.processing.execAlgorithmDialog(id, final_param_dict)
-        self.instance.clipboard().setText(str(final_param_dict))
 
     def parseParams(self, params):
         parsed_params = params.replace(";", "\n")
