@@ -9,6 +9,7 @@ from qgis.PyQt.QtWidgets import (
                                 QLabel,
                                 )
 from qgis.PyQt.QtGui import QIcon
+import qgis.processing
 from qgis.utils import iface
 from qgis.core import QgsApplication
 from .hist_connect import getNewDb, readNewHistory
@@ -22,7 +23,7 @@ class ParamPanel(QDockWidget):
         self.widget = QWidget()
         self.layout = QHBoxLayout()
         self.histtable = QTableWidget()
-        self.histtable.setColumnCount(4)
+        self.histtable.setColumnCount(5)
         self.histtable.setHorizontalHeaderLabels(["", "Algorithm", "Timestamp"])
         self.loadHistory()
         self.histtable.resizeColumnToContents(0)
@@ -30,6 +31,7 @@ class ParamPanel(QDockWidget):
         self.histtable.resizeColumnToContents(2)
         self.histtable.setMaximumWidth(500)
         self.histtable.itemClicked.connect(self.populateDetailView)
+        self.histtable.itemDoubleClicked.connect(self.launchAlgorithm)
         self.layout.addWidget(self.histtable)
         self.detaillabel = QLabel("Detail View")
         self.detaillabel.setMinimumWidth(300)
@@ -62,10 +64,13 @@ class ParamPanel(QDockWidget):
             self.histtable.setItem(pos, 2, timestamptableitem)
             paramtableitem = QTableWidgetItem(item[2])
             self.histtable.setItem(pos, 3, paramtableitem)
+            idtableitem = QTableWidgetItem(item[0])
+            self.histtable.setItem(pos, 4, idtableitem)
             pos += 1
         self.histtable.sortItems(2, 1)
         self.histtable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.histtable.setColumnHidden(3, True)
+        self.histtable.setColumnHidden(4, True)
 
     def populateDetailView(self):
         row = self.histtable.currentItem().row()
@@ -74,6 +79,12 @@ class ParamPanel(QDockWidget):
         params = self.parseParams(self.histtable.item(row, 3).text())
         self.detailstring = "Detail View\n" + "Algorithm: " + algo + "\n" + "time: " + time + "\n" + "Parameters: \n" + params
         self.detaillabel.setText(self.detailstring)
+
+    def launchAlgorithm(self):
+        row = self.histtable.currentItem().row()
+        id = self.histtable.item(row, 4).text()
+        raw_params = self.histtable.item(row, 3).text()
+        qgis.processing.execAlgorithmDialog(id)
 
     def parseParams(self, params):
         parsed_params = params.replace(";", "\n")
@@ -87,6 +98,5 @@ class ParamPanel(QDockWidget):
                 item = self.histtable.item(row, 1)
                 self.histtable.setRowHidden(row, search_term not in item.text().lower())
         
-    # TODO: add ability to re-launch algorithm with previous parameters from table
     # TODO: add ability to copy selected history item to clipboard (so you can put it in qNote)
-    # TODO: add ability to search
+    # TODO: connect to algorithm run signal to update history
