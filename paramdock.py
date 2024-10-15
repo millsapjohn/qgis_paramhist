@@ -106,7 +106,16 @@ class ParamPanel(QDockWidget):
         row = self.histtable.currentItem().row()
         id = self.histtable.item(row, 4).text()
         raw_params = self.histtable.item(row, 3).text()
-        qgis.processing.execAlgorithmDialog(id)
+        split_params = raw_params.split(';')
+        stripped_params = [item.strip() for item in split_params]
+        for item in stripped_params:
+            if item == '' or item == ' ':
+                stripped_params.pop(stripped_params.index(item))
+        resplit_params = [item.split(': ') for item in stripped_params]
+        raw_param_dict = dict((param, value) for param, value in resplit_params)
+        final_param_dict = {key: val for key, val in raw_param_dict.items() if key != 'unknown' and raw_param_dict.get(key) != 'unknown'}
+        qgis.processing.execAlgorithmDialog(id, final_param_dict)
+        self.instance.clipboard().setText(str(final_param_dict))
 
     def parseParams(self, params):
         parsed_params = params.replace(";", "\n")
@@ -131,6 +140,4 @@ class ParamPanel(QDockWidget):
     def clipAction(self):
         self.instance.clipboard().setText(self.detaillabel.toPlainText())
         
-    # TODO: add ability to copy selected history item to clipboard (so you can put it in qNote)
     # TODO: connect to algorithm run signal to update history
-    # TODO: format text in detail view
