@@ -61,7 +61,9 @@ def parseHistory(hist):
                 try:
                     value = child.attrib['value']
                 except KeyError:
-                    value = 'unknown'
+                    value = 'N/A'
+            if value == '':
+                value = 'N/A'
             params_string = params_string + name + ': ' + value + '; '
             item_dict['params'] = params_string
         parsed_list.append(item_dict)
