@@ -1,23 +1,20 @@
 [general]
-name=plugin
+name=Parameter History
 qgisMinimumVersion=3.00
 email=jmillsapengineer@gmail.com
 author=John Millsap
-description=description
-about=long description
-version=0.1
-repository=repo
+description=a better processing history plugin
+about=shows processing history in a more human-readable format. Allows users to re-run algorithms with previous input parameters pre-filled.
+version=1.0
+repository=https://github.com/millsapjohn/qgis_paramhist
 
-category=RasterVectorDatabaseMeshWeb
-changelog=changelog
-experimental=True
+experimental=False
 deprecated=False
-tags=tag,tag1
-homepage=homepage
-tracker=tracker
+tags=processing,history
+homepage=https://github.com/millsapjohn/qgis_paramhist
+tracker=https://github.com/millsapjohn/qgis_paramhist/issues
 qgisMaximumVersion=3.99
 icon=icon
-plugin_dependencies=plugin1,plugin2
 server=False
 hasProcessingProvider=False
 
