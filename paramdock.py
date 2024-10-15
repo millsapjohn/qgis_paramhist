@@ -141,4 +141,4 @@ class ParamPanel(QDockWidget):
     def clipAction(self):
         self.instance.clipboard().setText(self.detaillabel.toPlainText())
         
-    # TODO: connect to algorithm run signal to update history
+    # TODO: connect to algorithm run signal to update history. See QgsProcessingAlgRunnerTask

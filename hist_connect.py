@@ -16,12 +16,24 @@ def getNewDb(app: QgsApplication):
 
     return newdbpath
 
+def getSingleEntry(db):
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    res = cur.execute('SELECT timestamp, xml FROM history ORDER BY timestamp DESC')
+    raw_hist = res.fetchone()
+    cur.close()
+    con.close()
+
+    return raw_hist
+
 def fetchHistory(db):
     con = sqlite3.connect(db)
     cur = con.cursor()
     res = cur.execute('SELECT timestamp, xml FROM history')
     # returns a list of tuples (timestamps, raw XML text of history items)
     raw_hist = res.fetchall()
+    cur.close()
+    con.close()
     return raw_hist
 
 def parseHistory(hist): 
@@ -68,6 +80,14 @@ def parseHistory(hist):
             item_dict['params'] = params_string
         parsed_list.append(item_dict)
     return parsed_list
+
+def writeSingleEntry(db, parsed_hist):
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    cur.execute('INSERT INTO history (timestamp, id, algorithm, params) VALUES (:timestamp, :id, :algorithm, :params)', parsed_hist)
+    con.commit()
+    cur.close()
+    con.close()
 
 def writeHistory(db, parsed_list):
     con = sqlite3.connect(db)
