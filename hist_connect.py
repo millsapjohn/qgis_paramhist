@@ -48,10 +48,20 @@ def parseHistory(hist):
                 name = child.attrib['name']
             except KeyError:
                 name = 'unknown'
-            try:
-                value = child.attrib['value']
-            except KeyError:
-                value = 'unknown'
+            # nodes of type List don't have their own value, they have grandchildren with values
+            if child.attrib['name'] == "TABLE":
+                value = []
+                for grandchild in child.iter():
+                    try:
+                        value.append(grandchild.attrib['value'])
+                    except KeyError:
+                        continue
+                value = ' '.join(str(x) for x in value)
+            else:
+                try:
+                    value = child.attrib['value']
+                except KeyError:
+                    value = 'unknown'
             params_string = params_string + name + ': ' + value + '; '
             item_dict['params'] = params_string
         parsed_list.append(item_dict)
