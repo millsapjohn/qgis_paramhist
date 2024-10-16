@@ -36,6 +36,42 @@ def fetchHistory(db):
     con.close()
     return raw_hist
 
+def parseSingleEntry(hist):
+    item_dict = {}
+    item_dict['timestamp'] = hist[0]
+    root = et.fromstring(hist[1])
+    id = root[0].attrib['value']
+    item_dict['id'] = id
+    alg = QgsApplication.processingRegistry().algorithmById(id)
+    try:
+        item_dict['algorithm'] = alg.displayName()
+    except AttributeError:
+        item_dict['algorithm'] = id
+    params_string = ""
+    for child in root[2][3]:
+        try:
+            name = child.attrib['name']
+        except KeyError:
+            name = 'unknown'
+        if child.attrib['name'] == "TABLE":
+            value = []
+            for grandchild in child.iter():
+                try:
+                    value.append(grandchild.attrib['value'])
+                except KeyError:
+                    continue
+            value = ' '.join(str(x) for x in value)
+        else:
+            try:
+                value = child.attrib['value']
+            except KeyError:
+                value = 'N/A'
+            if value == '':
+                value = 'N/A'
+            params_string = params_string + name + ': ' + value + '; '
+            item_dict['params'] = params_string
+    return item_dict                
+
 def parseHistory(hist): 
     '''takes the raw history (list of tuples)
     will return a list of dicts where each dict represents a single history item
@@ -110,7 +146,7 @@ def readNewHistory(db):
 def readSingleNewEntry(db):
     con = sqlite3.connect(db)
     cur = con.cursor()
-    cur.execute("SELECT id, algorithm, params, timestamp FROM history SORT BY timestamp DESC")
+    cur.execute("SELECT id, algorithm, params, timestamp FROM history ORDER BY timestamp DESC")
     res = cur.fetchone()
     cur.close()
     con.close()

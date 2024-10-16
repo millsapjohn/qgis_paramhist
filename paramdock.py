@@ -15,7 +15,7 @@ from qgis.PyQt.QtGui import QIcon
 import qgis.processing
 from qgis.utils import iface
 from qgis.core import QgsApplication
-from .hist_connect import getNewDb, readNewHistory, getSingleEntry, writeSingleEntry
+from .hist_connect import getProfileDb, getNewDb, readNewHistory, getSingleEntry, writeSingleEntry, parseSingleEntry, readSingleNewEntry
 
 class ParamPanel(QDockWidget):
     def __init__(self, iface):
@@ -144,28 +144,30 @@ class ParamPanel(QDockWidget):
         self.instance.clipboard().setText(self.detaillabel.toPlainText())
 
     def updateHistory(self):
+        oldDb = getProfileDb(self.instance)
         newDb = getNewDb(self.instance)
-        singleEntry = getSingleEntry(newDb)
-        writeSingleEntry(newDb, singleEntry)
-        newEntry = readSingleNewEntry(newDb)
-        rowCount = self.histtable.rowCount()
-        newRow = rowCount + 1
-        id = newEntry[0]
-        try:
-            icon = self.instance.processingRegistry().algorithmById(id).icon()
-        except AttributeError:
-            icon = QIcon(":/qt-project.org/styles/commonstyle/images/stop-32.png")
-        icontableitem = QTableWidgetItem()
-        icontableitem.setIcon(icon)
-        self.histtable.setItem(newRow, 0, icontableitem)
-        algtableitem = QTableWidgetItem(newEntry[1])
-        self.histtable.setItem(newRow, 1, algtableitem)
-        timestamptableitem = QTableWidgetItem(newEntry[3])
-        self.histtable.setItem(newRow, 2, timestamptableitem)
-        paramtableitem = QTableWidgetItem(newEntry[2])
-        self.histtable.setItem(newRow, 3, paramtableitem)
-        idtableitem = QTableWidgetItem(newEntry[0])
-        self.histtable.setItem(newRow, 4, idtableitem)
-        self.histtable.sortItems(2, 1)
-     
-# TODO: this assumes layersChanged is always the result of an alg being run; need to add in a check for last timestamp to prevent duplicate entries
+        singleEntry = getSingleEntry(oldDb)
+        if singleEntry[0] == self.histtable.item(0, 2).text():
+            pass
+        else:
+            parsedEntry = parseSingleEntry(singleEntry)
+            writeSingleEntry(newDb, parsedEntry)
+            newEntry = readSingleNewEntry(newDb)
+            rowCount = self.histtable.rowCount()
+            id = newEntry[0]
+            try:
+                icon = self.instance.processingRegistry().algorithmById(id).icon()
+            except AttributeError:
+                icon = QIcon(":/qt-project.org/styles/commonstyle/images/stop-32.png")
+            self.histtable.insertRow(0)
+            icontableitem = QTableWidgetItem()
+            icontableitem.setIcon(icon)
+            self.histtable.setItem(0, 0, icontableitem)
+            algtableitem = QTableWidgetItem(newEntry[1])
+            self.histtable.setItem(0, 1, algtableitem)
+            timestamptableitem = QTableWidgetItem(newEntry[3])
+            self.histtable.setItem(0, 2, timestamptableitem)
+            paramtableitem = QTableWidgetItem(newEntry[2])
+            self.histtable.setItem(0, 3, paramtableitem)
+            idtableitem = QTableWidgetItem(newEntry[0])
+            self.histtable.setItem(0, 4, idtableitem)

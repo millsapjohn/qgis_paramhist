@@ -19,7 +19,7 @@ class ParamHistPlugin:
             writeHistory(self.newdbpath, self.parsed_history)
 
     def initGui(self):
-        self.dock = ParamPanel()
+        self.dock = ParamPanel(self.iface)
         self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.dock)
 
     def unload(self):
@@ -32,5 +32,3 @@ class ParamHistPlugin:
             return True
         else:
             return False
-
-# TODO: connect to whatever signal is emitted by an algorithm to dynamically update history
