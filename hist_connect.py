@@ -106,3 +106,12 @@ def readNewHistory(db):
     cur.close()
     con.close()
     return res
+
+def readSingleNewEntry(db):
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    cur.execute("SELECT id, algorithm, params, timestamp FROM history SORT BY timestamp DESC")
+    res = cur.fetchone()
+    cur.close()
+    con.close()
+    return res

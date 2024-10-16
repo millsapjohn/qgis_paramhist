@@ -15,14 +15,17 @@ from qgis.PyQt.QtGui import QIcon
 import qgis.processing
 from qgis.utils import iface
 from qgis.core import QgsApplication
-from .hist_connect import getNewDb, readNewHistory
+from .hist_connect import getNewDb, readNewHistory, getSingleEntry, writeSingleEntry
 
 class ParamPanel(QDockWidget):
-    def __init__(self):
+    def __init__(self, iface):
         super().__init__()
         self.setObjectName('ParamHistory')
         self.setWindowTitle("Param History")
         self.instance = QgsApplication.instance()
+        self.iface = iface
+        self.canvas = iface.mapCanvas()
+        self.canvas.layersChanged.connect(self.updateHistory)
         # overall layout
         self.widget = QWidget()
         self.layout = QHBoxLayout()
@@ -139,5 +142,30 @@ class ParamPanel(QDockWidget):
 
     def clipAction(self):
         self.instance.clipboard().setText(self.detaillabel.toPlainText())
-        
-    # TODO: connect to algorithm run signal to update history. See QgsProcessingAlgRunnerTask
+
+    def updateHistory(self):
+        newDb = getNewDb(self.instance)
+        singleEntry = getSingleEntry(newDb)
+        writeSingleEntry(newDb, singleEntry)
+        newEntry = readSingleNewEntry(newDb)
+        rowCount = self.histtable.rowCount()
+        newRow = rowCount + 1
+        id = newEntry[0]
+        try:
+            icon = self.instance.processingRegistry().algorithmById(id).icon()
+        except AttributeError:
+            icon = QIcon(":/qt-project.org/styles/commonstyle/images/stop-32.png")
+        icontableitem = QTableWidgetItem()
+        icontableitem.setIcon(icon)
+        self.histtable.setItem(newRow, 0, icontableitem)
+        algtableitem = QTableWidgetItem(newEntry[1])
+        self.histtable.setItem(newRow, 1, algtableitem)
+        timestamptableitem = QTableWidgetItem(newEntry[3])
+        self.histtable.setItem(newRow, 2, timestamptableitem)
+        paramtableitem = QTableWidgetItem(newEntry[2])
+        self.histtable.setItem(newRow, 3, paramtableitem)
+        idtableitem = QTableWidgetItem(newEntry[0])
+        self.histtable.setItem(newRow, 4, idtableitem)
+        self.histtable.sortItems(2, 1)
+     
+# TODO: this assumes layersChanged is always the result of an alg being run; need to add in a check for last timestamp to prevent duplicate entries
