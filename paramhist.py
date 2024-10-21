@@ -15,8 +15,11 @@ class ParamHistPlugin:
         else:
             self.history_db = getProfileDb(self.instance)
             self.raw_history = fetchHistory(self.history_db)
-            self.parsed_history = parseHistory(self.raw_history)
-            writeHistory(self.newdbpath, self.parsed_history)
+            if self.raw_history == None:
+                pass
+            else:
+                self.parsed_history = parseHistory(self.raw_history)
+                writeHistory(self.newdbpath, self.parsed_history)
 
     def initGui(self):
         self.dock = ParamPanel(self.iface)
