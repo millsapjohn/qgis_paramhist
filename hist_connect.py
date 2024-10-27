@@ -40,36 +40,39 @@ def parseSingleEntry(hist):
     item_dict = {}
     item_dict['timestamp'] = hist[0]
     root = et.fromstring(hist[1])
-    id = root[0].attrib['value']
-    item_dict['id'] = id
-    alg = QgsApplication.processingRegistry().algorithmById(id)
-    try:
-        item_dict['algorithm'] = alg.displayName()
-    except AttributeError:
-        item_dict['algorithm'] = id
-    params_string = ""
-    for child in root[2][3]:
-        try:
-            name = child.attrib['name']
-        except KeyError:
-            name = 'unknown'
-        if child.attrib['name'] == "TABLE":
-            value = []
-            for grandchild in child.iter():
-                try:
-                    value.append(grandchild.attrib['value'])
-                except KeyError:
-                    continue
-            value = ' '.join(str(x) for x in value)
-        else:
+    for child in root:
+        if child.attrib['name'] == 'algorithm_id':
+            id = child.attrib['value']
+            item_dict['id'] = id
+            alg = QgsApplication.processingRegistry().algorithmById(id)
             try:
-                value = child.attrib['value']
-            except KeyError:
-                value = 'N/A'
-            if value == '':
-                value = 'N/A'
-            params_string = params_string + name + ': ' + value + '; '
-            item_dict['params'] = params_string
+                item_dict['algorithm'] = alg.displayName()
+            except AttributeError:
+                item_dict['algorithm'] = id
+        elif child.attrib['name'] == 'parameters':
+            params_string = ""
+            for grandchild in child:
+                try:
+                    name = grandchild.attrib['name']
+                except KeyError:
+                    name = 'unknown'
+                if name == "TABLE":
+                    value = []
+                    for ggchild in grandchild:
+                        try:
+                            value.append(ggchild.attrib['value'])
+                        except KeyError:
+                            continue
+                    value = ' '.join(str(x) for x in value)
+                else:
+                    try:
+                        value = grandchild.attrib['value']
+                    except KeyError:
+                        value = 'N/A'  
+                if value == '':
+                    value = 'N/A'
+                params_string = params_string + name + ': ' + value + '; '
+                item_dict['params'] = params_string
     return item_dict                
 
 def parseHistory(hist): 
@@ -83,37 +86,41 @@ def parseHistory(hist):
         item_dict['timestamp'] = item[0]
         # second field in the tuple is a raw XML string, so we need to parse that
         root = et.fromstring(item[1])
-        id = root[0].attrib['value']
-        item_dict['id'] = id
-        alg = QgsApplication.processingRegistry().algorithmById(id)
-        try:
-            item_dict['algorithm'] = alg.displayName()
-        except AttributeError:
-            item_dict['algorithm'] = id
-        params_string = ""
-        for child in root[2][3]:
-            try:
-                name = child.attrib['name']
-            except KeyError:
-                name = 'unknown'
-            # nodes of type List don't have their own value, they have grandchildren with values
-            if child.attrib['name'] == "TABLE":
-                value = []
-                for grandchild in child.iter():
-                    try:
-                        value.append(grandchild.attrib['value'])
-                    except KeyError:
-                        continue
-                value = ' '.join(str(x) for x in value)
-            else:
+        for child in root:
+            if child.attrib['name'] == 'algorithm_id':
+                id = child.attrib['value']
+                item_dict['id'] = id
+                alg = QgsApplication.processingRegistry().algorithmById(id)
                 try:
-                    value = child.attrib['value']
-                except KeyError:
-                    value = 'N/A'
-            if value == '':
-                value = 'N/A'
-            params_string = params_string + name + ': ' + value + '; '
-            item_dict['params'] = params_string
+                    item_dict['algorithm'] = alg.displayName()
+                except AttributeError:
+                    item_dict['algorithm'] = id
+            elif child.attrib['name'] == 'parameters':
+                params_string = ""
+                for grandchild in child:
+                    try:
+                        name = grandchild.attrib['name']
+                    except KeyError:
+                        name = 'unknown'
+                    if name == "TABLE":
+                        value = []
+                        for ggchild in grandchild:
+                            try:
+                                value.append(ggchild.attrib['value'])
+                            except KeyError:
+                                continue
+                        value = ' '.join(str(x) for x in value)
+                    else:
+                        try:
+                            value = grandchild.attrib['value']
+                        except KeyError:
+                            value = 'N/A'
+                    if value == '':
+                        value = 'N/A'
+                    params_string = params_string + name + ': ' + value + '; '
+                    item_dict['params'] = params_string
+            else:
+                continue
         parsed_list.append(item_dict)
     return parsed_list
 

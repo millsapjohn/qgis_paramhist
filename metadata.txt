@@ -5,8 +5,10 @@ email=jmillsapengineer@gmail.com
 author=John Millsap
 description=a better processing history plugin
 about=shows processing history in a more human-readable format. Allows users to re-run algorithms with previous input parameters pre-filled.
-version=1.0
+version=1.0.1
 repository=https://github.com/millsapjohn/qgis_paramhist
+changelog=1.0.1 2024-10-26
+	- fixed issues with different history db structures
 
 experimental=False
 deprecated=False
