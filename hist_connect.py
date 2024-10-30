@@ -56,23 +56,31 @@ def parseSingleEntry(hist):
                     name = grandchild.attrib['name']
                 except KeyError:
                     name = 'unknown'
-                if name == "TABLE":
-                    value = []
+                if name == "inputs":
                     for ggchild in grandchild:
                         try:
-                            value.append(ggchild.attrib['value'])
+                            name = ggchild.attrib['name']
                         except KeyError:
-                            continue
-                    value = ' '.join(str(x) for x in value)
-                else:
-                    try:
-                        value = grandchild.attrib['value']
-                    except KeyError:
-                        value = 'N/A'  
-                if value == '':
-                    value = 'N/A'
-                params_string = params_string + name + ': ' + value + '; '
-                item_dict['params'] = params_string
+                            name = 'unknown'
+                        if name == 'TABLE':
+                            value = []
+                            for gggchild in ggchild:
+                                try: 
+                                    value.append(gggchild.attrib['value'])
+                                except KeyError:
+                                    continue
+                            value = ' '.join(str(x) for x in value)
+                        else:
+                            try: 
+                                value = ggchild.attrib['value']
+                            except KeyError:
+                                value = 'N/A'
+                        if value == '':
+                            value = 'N/A'
+                        params_string = params_string + name + ': ' + value + '; '
+                        item_dict['params'] = params_string
+        else:
+            continue
     return item_dict                
 
 def parseHistory(hist): 
@@ -102,23 +110,29 @@ def parseHistory(hist):
                         name = grandchild.attrib['name']
                     except KeyError:
                         name = 'unknown'
-                    if name == "TABLE":
-                        value = []
+                    if name == "inputs":
                         for ggchild in grandchild:
                             try:
-                                value.append(ggchild.attrib['value'])
+                                name = ggchild.attrib['name']
                             except KeyError:
-                                continue
-                        value = ' '.join(str(x) for x in value)
-                    else:
-                        try:
-                            value = grandchild.attrib['value']
-                        except KeyError:
-                            value = 'N/A'
-                    if value == '':
-                        value = 'N/A'
-                    params_string = params_string + name + ': ' + value + '; '
-                    item_dict['params'] = params_string
+                                name = 'unknown'
+                            if name == 'TABLE':
+                                value = []
+                                for gggchild in ggchild:
+                                    try: 
+                                        value.append(gggchild.attrib['value'])
+                                    except KeyError:
+                                        continue
+                                value = ' '.join(str(x) for x in value)
+                            else:
+                                try: 
+                                    value = ggchild.attrib['value']
+                                except KeyError:
+                                    value = 'N/A'
+                            if value == '':
+                                value = 'N/A'
+                            params_string = params_string + name + ': ' + value + '; '
+                            item_dict['params'] = params_string
             else:
                 continue
         parsed_list.append(item_dict)
