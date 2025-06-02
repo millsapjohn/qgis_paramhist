@@ -12,6 +12,7 @@ from qgis.PyQt.QtWidgets import (
                                 QPushButton,
                                 )
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtCore import Qt
 import qgis.processing
 from qgis.utils import iface
 from qgis.core import QgsApplication
@@ -92,8 +93,8 @@ class ParamPanel(QDockWidget):
             idtableitem = QTableWidgetItem(item[0])
             self.histtable.setItem(pos, 4, idtableitem)
             pos += 1
-        self.histtable.sortItems(2, 1)
-        self.histtable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.histtable.sortItems(2, Qt.SortOrder.DescendingOrder)
+        self.histtable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.histtable.setColumnHidden(3, True)
         self.histtable.setColumnHidden(4, True)
 

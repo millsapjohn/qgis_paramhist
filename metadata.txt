@@ -5,16 +5,18 @@ email=jmillsapengineer@gmail.com
 author=John Millsap
 description=a better processing history plugin
 about=shows processing history in a more human-readable format. Allows users to re-run algorithms with previous input parameters pre-filled.
-version=1.0.2
+version=1.1
+supportsQt6=True
 repository=https://github.com/millsapjohn/qgis_paramhist
-changelog=1.0.2 2024-10-30 - fixed issue with loading nested parameters
+changelog=
+	1.1 2025-06-02 - porting to Qt6
+	1.0.2 2024-10-30 - fixed issue with loading nested parameters
 
 experimental=False
 deprecated=False
 tags=processing,history
 homepage=https://github.com/millsapjohn/qgis_paramhist
 tracker=https://github.com/millsapjohn/qgis_paramhist/issues
-qgisMaximumVersion=3.99
 icon=icon
 server=False
 hasProcessingProvider=False

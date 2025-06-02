@@ -23,7 +23,7 @@ class ParamHistPlugin:
 
     def initGui(self):
         self.dock = ParamPanel(self.iface)
-        self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.dock)
+        self.iface.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.dock)
 
     def unload(self):
         self.iface.removeDockWidget(self.dock)
