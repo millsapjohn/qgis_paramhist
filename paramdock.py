@@ -148,9 +148,14 @@ class ParamPanel(QDockWidget):
         oldDb = getProfileDb(self.instance)
         newDb = getNewDb(self.instance)
         singleEntry = getSingleEntry(oldDb)
+        try:
+            # doing it this way prevents errors if the first algo in the db didn't execute correctly
+            compText = self.histtable.item(0, 2).text()
+        except AttributeError:
+            compText = ""
         if singleEntry == None:
             pass
-        elif singleEntry[0] == self.histtable.item(0, 2).text():
+        elif singleEntry[0] == compText:
             pass
         else:
             parsedEntry = parseSingleEntry(singleEntry)
