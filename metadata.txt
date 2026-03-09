@@ -1,6 +1,7 @@
 [general]
 name=Parameter History
 qgisMinimumVersion=3.00
+qgisMaximumVersion=4.99
 email=jmillsapengineer@gmail.com
 author=John Millsap
 description=a better processing history plugin
